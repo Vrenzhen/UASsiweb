@@ -1,24 +1,46 @@
-'use client'; // Wajib ditambahkan untuk interaksi klik
+'use client'; 
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
-  // State untuk menyimpan tab mana yang sedang aktif (user atau admin)
   const [activeTab, setActiveTab] = useState<'user' | 'admin'>('user');
   
-  // Router untuk berpindah halaman
+  // State baru untuk menyimpan input dan pesan error
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [errorMsg, setErrorMsg] = useState('');
+  
   const router = useRouter();
+
+  // Fungsi untuk mereset kolom teks saat ganti tab (User/Admin)
+  const handleTabChange = (tab: 'user' | 'admin') => {
+    setActiveTab(tab);
+    setUsername('');
+    setPassword('');
+    setErrorMsg('');
+  };
 
   // Fungsi saat tombol login ditekan
   const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault(); // Mencegah halaman reload
+    e.preventDefault();
+    setErrorMsg(''); // Reset error setiap kali tombol ditekan
     
-    // Arahkan ke halaman yang sesuai berdasarkan tab yang dipilih
+    // Logika Validasi User
     if (activeTab === 'user') {
-      router.push('/user'); // Ke halaman tracking user
-    } else {
-      router.push('/dashboard'); // Ke halaman admin
+      if (username === 'user' && password === 'User123') {
+        router.push('/user'); 
+      } else {
+        setErrorMsg('Invalid Username or Password for User!');
+      }
+    } 
+    // Logika Validasi Admin
+    else if (activeTab === 'admin') {
+      if (username === 'admin' && password === 'Admin123') {
+        router.push('/dashboard'); 
+      } else {
+        setErrorMsg('Invalid Admin ID or Password!');
+      }
     }
   };
 
@@ -49,23 +71,30 @@ export default function LoginPage() {
         {/* Borang Log Masuk */}
         <div className="bg-[#11131A] p-8 rounded-lg border border-gray-800 shadow-2xl">
           
-          {/* Tab Pengguna / Admin (BISA DIKLIK) */}
-          <div className="flex mb-8 rounded bg-black overflow-hidden border border-gray-800">
+          {/* Tab Pengguna / Admin */}
+          <div className="flex mb-6 rounded bg-black overflow-hidden border border-gray-800">
             <button 
               type="button"
-              onClick={() => setActiveTab('user')}
+              onClick={() => handleTabChange('user')}
               className={`flex-1 py-3 text-xs font-bold tracking-widest transition-colors ${activeTab === 'user' ? 'bg-[#D977F9] text-[#250F2D]' : 'text-gray-500 hover:text-gray-300'}`}
             >
               USER
             </button>
             <button 
               type="button"
-              onClick={() => setActiveTab('admin')}
+              onClick={() => handleTabChange('admin')}
               className={`flex-1 py-3 text-xs font-bold tracking-widest transition-colors ${activeTab === 'admin' ? 'bg-[#D977F9] text-[#250F2D]' : 'text-gray-500 hover:text-gray-300'}`}
             >
               ADMIN
             </button>
           </div>
+
+          {/* Menampilkan Pesan Error Jika Ada */}
+          {errorMsg && (
+            <div className="mb-6 p-3 bg-red-500/10 border border-red-500/50 rounded text-red-400 text-[10px] font-bold tracking-widest text-center animate-pulse">
+              ⚠️ {errorMsg}
+            </div>
+          )}
 
           <form onSubmit={handleLogin} className="space-y-6">
             <div>
@@ -74,7 +103,14 @@ export default function LoginPage() {
               </label>
               <div className="relative">
                 <span className="absolute left-4 top-3 text-gray-500">👤</span>
-                <input required type="text" placeholder="ENTER CREDENTIALS" className="w-full bg-[#1A1C24] border border-transparent text-white text-xs p-4 pl-10 rounded focus:border-[#D977F9] focus:outline-none placeholder-gray-600 transition" />
+                <input 
+                  required 
+                  type="text" 
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  placeholder="ENTER CREDENTIALS" 
+                  className="w-full bg-[#1A1C24] border border-transparent text-white text-xs p-4 pl-10 rounded focus:border-[#D977F9] focus:outline-none placeholder-gray-600 transition" 
+                />
               </div>
             </div>
             
@@ -85,7 +121,14 @@ export default function LoginPage() {
               </div>
               <div className="relative">
                 <span className="absolute left-4 top-3 text-gray-500">🔒</span>
-                <input required type="password" placeholder="••••••••" className="w-full bg-[#1A1C24] border border-transparent text-white text-xs p-4 pl-10 rounded focus:border-[#D977F9] focus:outline-none placeholder-gray-600 transition" />
+                <input 
+                  required 
+                  type="password" 
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••" 
+                  className="w-full bg-[#1A1C24] border border-transparent text-white text-xs p-4 pl-10 rounded focus:border-[#D977F9] focus:outline-none placeholder-gray-600 transition" 
+                />
               </div>
             </div>
 
